@@ -7,6 +7,7 @@ use App\Http\Middleware\EnsureSuperadmin;
 
 
 
+
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
@@ -18,6 +19,8 @@ return Application::configure(basePath: dirname(__DIR__))
          $middleware->alias([
             'superadmin' => EnsureSuperadmin::class, // ✅ register here
             'tenant.access' => \App\Http\Middleware\CheckTenantAccess::class,
+            'tenant' => \App\Http\Middleware\TenantMiddleware::class,
+
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
