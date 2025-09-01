@@ -1,30 +1,35 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Adapters\POS\POSAdapter;  // Import your adapter interface
+use App\Factories\POSAdapterFactory;
 
 class POSSyncController extends Controller
 {
-    protected $adapter;
+    protected $adapterFactory;
 
-    // Constructor injects the adapter implementation automatically
-    public function __construct(POSAdapter $adapter)
+    public function __construct(POSAdapterFactory $adapterFactory)
     {
-        $this->adapter = $adapter;  // Laravel injects SwiftPOSAdapter here
+        $this->adapterFactory = $adapterFactory;
     }
 
-    // Example sync method called on POS sync POST requests
-    public function sync(Request $request)
+    public function sync(Request $request, string $tenantPath)
     {
-        $tenant = app('currentTenant'); // Assuming middleware sets this
+        // Determine which POS to use from request or tenant config
+        $tenant = app('currentTenant'); // assumes middleware set this
+        $posName = $tenant->pos_system; // e.g., 'swiftpos', 'shopfrontpos', 'abspos'
 
-        // Use adapter to fetch or sync data for the current store/tenant
-        $products = $this->adapter->fetchProducts($tenant);
+        try {
+            $adapter = $this->adapterFactory->make($posName);
 
-        // TODO: persist $products to tenant DB, dispatch jobs, etc.
+            // Fetch products from POS and persist
+            $products = $adapter->fetchProducts($tenant);
+            // Persist products with repositories/jobs here...
 
-        return response()->json(['message' => 'POS sync successful']);
+            return response()->json(['message' => 'POS sync successful', 'data' => $products]);
+        } catch (\InvalidArgumentException $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
     }
 }
+
