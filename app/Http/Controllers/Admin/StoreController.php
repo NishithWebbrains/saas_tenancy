@@ -24,25 +24,35 @@ class StoreController extends Controller
     public function store(Request $request, CreateStoreAndTenantService $service)
     {
         $data = $request->validate([
-            'name'     => ['required','string','max:255'],
-            'pos_type' => ['required','in:shopfrontpos,swiftpos,abspos'],
+            'name'     => ['required', 'string', 'max:255'],
+            'pos_type' => ['required', 'in:shopfrontpos,swiftpos,abspos'],
         ]);
 
         $payload = [
             'name'          => $data['name'],
-            'slug'          => Str::slug($data['name']), // used as tenant ID + path
+            'slug'          => Str::slug($data['name']), // tenant ID + path
             'owner_user_id' => auth()->id(),
             'pos_type'      => $data['pos_type'],
         ];
 
         $tenant = $service->handle($payload);
 
-        // Build tenant path URL
-    $tenantUrl = url('/tenant/' . $tenant->name . '/dashboard2');
+        // Map pos_type to route segment (assuming 'shopfrontpos' => 'shopfront', etc.)
+        $posRouteSegmentMap = [
+            'shopfrontpos' => 'shopfront',
+            'swiftpos'    => 'swiftpos',
+            'abspos'      => 'abspos',
+        ];
+
+        $posSegment = $posRouteSegmentMap[$data['pos_type']] ?? 'shopfront';
+
+        // Build tenant path URL dynamically with POS segment
+        $tenantUrl = url('/tenant/' . $tenant->slug . '/' . $posSegment . '/dashboard');
 
         return redirect()->to($tenantUrl)
-            ->with('status','Store created and tenant initialized.');
+            ->with('status', 'Store created and tenant initialized.');
     }
+
 
 
     public function edit(Store $store)

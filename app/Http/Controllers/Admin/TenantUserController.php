@@ -30,133 +30,133 @@ class TenantUserController extends Controller
         return view('layouts.admin.stores.indexstoreusers');
     }
     public function storeusersdata()
-{
-    // Base query: all central users
-    $query = \App\Models\User::query();
+    {
+        // Base query: all central users
+        $query = \App\Models\User::query();
 
-    // Restrict to storeadmin’s users if needed
-    if (auth()->user()->hasRole('storeadmin')) {
-        $allowedUserIds = [];
+        // Restrict to storeadmin’s users if needed
+        if (auth()->user()->hasRole('storeadmin')) {
+            $allowedUserIds = [];
 
-        // Stores owned by this admin
-        $stores = Store::where('owner_user_id', auth()->id())->get();
+            // Stores owned by this admin
+            $stores = Store::where('owner_user_id', auth()->id())->get();
 
-        foreach ($stores as $store) {
-            $tenant = \App\Models\Tenant::find($store->tenant_id);
+            foreach ($stores as $store) {
+                $tenant = \App\Models\Tenant::find($store->tenant_id);
 
-            if ($tenant) {
-                $tenant->run(function () use (&$allowedUserIds) {
-                    $ids = DB::table('tenant_users')->pluck('user_id')->toArray();
-                    $allowedUserIds = array_merge($allowedUserIds, $ids);
-                });
+                if ($tenant) {
+                    $tenant->run(function () use (&$allowedUserIds) {
+                        $ids = DB::table('tenant_users')->pluck('user_id')->toArray();
+                        $allowedUserIds = array_merge($allowedUserIds, $ids);
+                    });
+                }
+            }
+
+            // Filter users
+            if (!empty($allowedUserIds)) {
+                $query->whereIn('id', $allowedUserIds);
+            } else {
+                // If no users, make query return nothing
+                $query->whereRaw('0 = 1');
             }
         }
 
-        // Filter users
-        if (!empty($allowedUserIds)) {
-            $query->whereIn('id', $allowedUserIds);
-        } else {
-            // If no users, make query return nothing
-            $query->whereRaw('0 = 1');
-        }
-    }
+        return DataTables::of($query)
+            ->addIndexColumn()
+            ->addColumn('stores', function ($user) {
+        $stores = [];
 
-    return DataTables::of($query)
-        ->addIndexColumn()
-        ->addColumn('stores', function ($user) {
-    $stores = [];
+        foreach (\App\Models\Tenant::all() as $tenant) {
+            // ✅ Get store from central DB first
+            $store = Store::where('tenant_id', $tenant->id)->first();
 
-    foreach (\App\Models\Tenant::all() as $tenant) {
-        // ✅ Get store from central DB first
-        $store = Store::where('tenant_id', $tenant->id)->first();
-
-        if (! $store) {
-            continue; // skip if no store for this tenant
-        }
-
-        // ✅ Then check inside tenant DB if user is assigned
-        $tenant->run(function () use ($tenant, $user, $store, &$stores) {
-            $assigned = DB::table('tenant_users')
-                ->where('user_id', $user->id)
-                ->exists();
-
-            if ($assigned) {
-                $stores[] = $store->name; // central store name
+            if (! $store) {
+                continue; // skip if no store for this tenant
             }
-        });
+
+            // ✅ Then check inside tenant DB if user is assigned
+            $tenant->run(function () use ($tenant, $user, $store, &$stores) {
+                $assigned = DB::table('tenant_users')
+                    ->where('user_id', $user->id)
+                    ->exists();
+
+                if ($assigned) {
+                    $stores[] = $store->name; // central store name
+                }
+            });
+        }
+
+        return empty($stores) ? '—' : implode(', ', $stores);
+        })
+
+            ->make(true);
     }
-
-    return empty($stores) ? '—' : implode(', ', $stores);
-})
-
-        ->make(true);
-}
 
 
     /**
      * Create user and assign to tenants.
      */
-   public function storeuser(Request $request)
-{
-    $request->validate([
-        'name'     => 'required|string|max:255',
-        'email'    => 'required|email|unique:users,email',
-        'password' => 'required|min:6',
-        'role'     => 'required|string',
-        'tenants'  => 'required|array',
-    ]);
-
-    // Step 1: Create central user
-    $user = User::create([
-        'name'     => $request->name,
-        'email'    => $request->email,
-        'password' => Hash::make($request->password),
-    ]);
-    $user->assignRole($request->role);
-
-
-    \Log::info("✅ Created central user", ['id' => $user->id, 'email' => $user->email]);
-
-    // Step 2: Assign user into selected tenant databases
-    foreach ($request->tenants as $tenantId) {
-    $tenant = Tenant::find($tenantId);
-
-    if (!$tenant) {
-        \Log::warning("⚠️ Tenant not found", ['tenant_id' => $tenantId]);
-        continue;
-    }
-
-    \Log::info("➡️ Assigning user to tenant", ['tenant_id' => $tenant->id]);
-
-    try {
-        $tenant->run(function () use ($user, $request, $tenant) {
-            DB::table('tenant_users')->insert([
-                'user_id'    => $user->id,
-                'role'       => $request->role,
-                'created_at' => now(),
-                'updated_at' => now(),
+    public function storeuser(Request $request)
+    {
+            $request->validate([
+                'name'     => 'required|string|max:255',
+                'email'    => 'required|email|unique:users,email',
+                'password' => 'required|min:6',
+                'role'     => 'required|string',
+                'tenants'  => 'required|array',
             ]);
 
-            \Log::info("✅ Inserted into tenant_users", [
-                'tenant_id' => $tenant->id,
-                'user_id'   => $user->id,
+            // Step 1: Create central user
+            $user = User::create([
+                'name'     => $request->name,
+                'email'    => $request->email,
+                'password' => Hash::make($request->password),
             ]);
-        });
-    } catch (\Exception $e) {
-        \Log::error("❌ Failed inserting into tenant_users", [
-            'tenant_id' => $tenant->id,
-            'user_id'   => $user->id,
-            'error'     => $e->getMessage(),
-        ]);
+            $user->assignRole($request->role);
 
-        dd("Error inserting into tenant {$tenant->id}", $e->getMessage());
+
+            \Log::info("✅ Created central user", ['id' => $user->id, 'email' => $user->email]);
+
+            // Step 2: Assign user into selected tenant databases
+            foreach ($request->tenants as $tenantId) {
+            $tenant = Tenant::find($tenantId);
+
+            if (!$tenant) {
+                \Log::warning("⚠️ Tenant not found", ['tenant_id' => $tenantId]);
+                continue;
+            }
+
+            \Log::info("➡️ Assigning user to tenant", ['tenant_id' => $tenant->id]);
+
+            try {
+                $tenant->run(function () use ($user, $request, $tenant) {
+                    DB::table('tenant_users')->insert([
+                        'user_id'    => $user->id,
+                        'role'       => $request->role,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+
+                    \Log::info("✅ Inserted into tenant_users", [
+                        'tenant_id' => $tenant->id,
+                        'user_id'   => $user->id,
+                    ]);
+                });
+            } catch (\Exception $e) {
+                \Log::error("❌ Failed inserting into tenant_users", [
+                    'tenant_id' => $tenant->id,
+                    'user_id'   => $user->id,
+                    'error'     => $e->getMessage(),
+                ]);
+
+                dd("Error inserting into tenant {$tenant->id}", $e->getMessage());
+            }
+        }
+
+
+            return redirect()->route('stores.index')
+                ->with('success', 'User created in central DB and assigned to selected tenants.');
     }
-}
-
-
-    return redirect()->route('stores.index')
-        ->with('success', 'User created in central DB and assigned to selected tenants.');
-}
 
 
 }
