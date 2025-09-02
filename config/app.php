@@ -28,12 +28,12 @@ return [
 
     'env' => env('APP_ENV', 'production'),
     
-    'providers' => [
-        // Other Laravel Service Providers...
-        // Add your provider here:
-        App\Providers\POSAdapterServiceProvider::class,
-    ],
-    /*
+    // 'providers' => [
+    //     // Other Laravel Service Providers...
+    //     // Add your provider here:
+    //     App\Providers\POSAdapterServiceProvider::class,
+    // ],
+    /*  
     |--------------------------------------------------------------------------
     | Application Debug Mode
     |--------------------------------------------------------------------------
