@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\POS\ShopfrontPos\Admin;
 
 use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
@@ -39,7 +39,7 @@ class StoreController extends Controller
 
         // Map pos_type to route segment (assuming 'shopfrontpos' => 'shopfront', etc.)
         $posRouteSegmentMap = [
-            'shopfrontpos' => 'shopfrontpos',
+            'shopfrontpos' => 'shopfront',
             'swiftpos'    => 'swiftpos',
             'abspos'      => 'abspos',
         ];

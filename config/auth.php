@@ -36,6 +36,20 @@ return [
     */
 
     'guards' => [
+        'shopfrontpos' => [
+            'driver' => 'session',
+            'provider' => 'shopfrontpos_users',
+        ],
+
+        'swiftpos' => [
+            'driver' => 'session',
+            'provider' => 'swiftpos_users',
+        ],
+
+        'abspos' => [
+            'driver' => 'session',
+            'provider' => 'abspos_users',
+        ],
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
@@ -60,6 +74,19 @@ return [
     */
 
     'providers' => [
+
+        'shopfrontpos_users' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\ShopfrontUser::class,
+        ],
+        'swiftpos_users' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\SwiftPOSUser::class,
+        ],
+        'abspos_users' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\ABSPosUser::class,
+        ],
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
