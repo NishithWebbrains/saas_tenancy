@@ -17,15 +17,17 @@ class CreateStoreAndTenantService
     public function handle(array $payload): Store
     {
         // For path-based tenancy, use slug as tenant ID (clean URLs)
-        $tenantId = $payload['slug'];
+        $tenantId = Str::random(19);
 
         // 1) Create the tenant (in central tenants table)
         /** @var \App\Models\Tenant $tenant */
         $tenant = Tenant::create([
-            'id' => $tenantId,
+            'id' => $payload['id'],
             'data' => [
                 'name'     => $payload['name'],
-                'database' => "tenant_{$tenantId}",
+                //'database' => "tenant_" . Str::random(19),
+                'database' => "tenant_{$payload['id']}",
+
             ],
         ]);
 
@@ -33,7 +35,7 @@ class CreateStoreAndTenantService
         $store = Store::create([
             'name'          => $payload['name'],
             'slug'          => $payload['slug'],
-            'tenant_id'     => $tenant->id,
+            'tenant_id'     => $payload['id'],
             'owner_user_id' => $payload['owner_user_id'],
             'pos_type'      => $payload['pos_type'],
         ]);

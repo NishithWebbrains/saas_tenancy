@@ -27,8 +27,9 @@ class StoreController extends Controller
             'name'     => ['required', 'string', 'max:255'],
             'pos_type' => ['required', 'in:shopfrontpos,swiftpos,abspos'],
         ]);
-
+        $tenantId = Str::random(19);
         $payload = [
+            'id'          => $tenantId,
             'name'          => $data['name'],
             'slug'          => Str::slug($data['name']), // tenant ID + path
             'owner_user_id' => auth()->id(),
@@ -47,7 +48,7 @@ class StoreController extends Controller
         $posSegment = $posRouteSegmentMap[$data['pos_type']] ?? 'shopfront';
 
         // Build tenant path URL dynamically with POS segment
-        $tenantUrl = url('/tenant/' . $tenant->slug . '/' . $posSegment . '/dashboard');
+        $tenantUrl = url('/' . $tenantId . '/' . $posSegment . '/dashboard');
 
         return redirect()->to($tenantUrl)
             ->with('status', 'Store created and tenant initialized.');

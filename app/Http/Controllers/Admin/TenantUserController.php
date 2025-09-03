@@ -154,7 +154,7 @@ class TenantUserController extends Controller
         }
 
 
-            return redirect()->route('stores.index')
+            return redirect()->route('stores.viewusers')
                 ->with('success', 'User created in central DB and assigned to selected tenants.');
     }
 

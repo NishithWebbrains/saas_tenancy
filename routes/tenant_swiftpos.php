@@ -9,7 +9,7 @@ Route::middleware([
     'auth',
     'tenant.access',
     InitializeTenancyByPath::class,
-])->prefix('/tenant/{tenant}/swiftpos')->group(function () {
+])->prefix('/{tenant}/swiftpos')->group(function () {
     Route::get('/dashboard', function () {
         $products = Product::all();
 

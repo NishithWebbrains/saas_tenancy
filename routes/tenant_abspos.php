@@ -9,7 +9,7 @@ Route::middleware([
     'auth',
     'tenant.access',
     InitializeTenancyByPath::class,
-])->prefix('/tenant/{tenant}/abspos')->group(function () {
+])->prefix('/{tenant}/abspos')->group(function () {
     Route::get('/dashboard', function () {
         $products = Product::all();
 
