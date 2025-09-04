@@ -4,7 +4,7 @@
 <div class="container">
     <h2>Add User</h2>
 
-    <form action="{{ route('stores.storeuser') }}" method="POST">
+<form action="{{ route('stores.storeuser') }}" method="POST">
     @csrf
     <div>
         <label>Name:</label>
@@ -32,10 +32,10 @@
     <div class="form-group">
         <label>Assign Tenants:</label>
         <div>
-            @foreach($tenants as $tenant)
+            @foreach($tenantList as $tenant)
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" name="tenants[]" id="tenant_{{ $tenant->id }}" value="{{ $tenant->id }}" style="width: 1.5em; height: 1.5em;">
-                   &nbsp; <label class="form-check-label" for="tenant_{{ $tenant->id }}" style="font-size: 1.2em;">{{ $tenant->id }}</label>
+                    <input class="form-check-input" type="checkbox" name="tenants[]" id="tenant_{{ $tenant['id'] }}" value="{{ $tenant['id'] }}">
+                    &nbsp; <label class="form-check-label" for="tenant_{{ $tenant['id'] }}" style="font-size: 1.2em;">{{ $tenant['name'] }}</label>
                 </div>
             @endforeach
         </div>

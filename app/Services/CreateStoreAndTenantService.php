@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Store;
 use App\Models\Tenant;
 use App\Models\User;
+use App\Models\Tenant\TenantDetail;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Artisan;
 
@@ -16,22 +17,24 @@ class CreateStoreAndTenantService
      */
     public function handle(array $payload): Store
     {
-        // For path-based tenancy, use slug as tenant ID (clean URLs)
-        $tenantId = Str::random(19);
-
-        // 1) Create the tenant (in central tenants table)
-        /** @var \App\Models\Tenant $tenant */
+        // Create the tenant (in central tenants table)
         $tenant = Tenant::create([
             'id' => $payload['id'],
             'data' => [
                 'name'     => $payload['name'],
-                //'database' => "tenant_" . Str::random(19),
                 'database' => "tenant_{$payload['id']}",
-
             ],
         ]);
-
-        // 2) Central "Store" record
+        $tenant->run(function () use ($payload, $tenant) {
+            // Store tenant details
+            TenantDetail::create([
+                'tenant_id' => $tenant->id,
+                'name'      => $payload['name'],
+                'slug'      => $payload['slug'],
+                'pos_type'  => $payload['pos_type'],
+            ]);
+        });
+        // Central "Store" record
         $store = Store::create([
             'name'          => $payload['name'],
             'slug'          => $payload['slug'],
@@ -40,20 +43,16 @@ class CreateStoreAndTenantService
             'pos_type'      => $payload['pos_type'],
         ]);
 
-        // 3) Link owner user to tenant (many-to-many)
-        /** @var User $owner */
+        // Link owner user to tenant (many-to-many)
         $owner = User::findOrFail($payload['owner_user_id']);
         $owner->tenants()->syncWithoutDetaching([$tenant->id]);
 
-        // 4) Run tenant migrations (base + pos-specific)
+        // Run tenant migrations (base + pos-specific)
         $tenant->run(function () use ($payload) {
-            // Run common tenant migrations
             Artisan::call('migrate', [
                 '--path'  => 'database/migrations/tenant',
                 '--force' => true,
             ]);
-
-            // Run POS-specific migrations if available
             $posMigrationPath = "database/migrations/tenant/{$payload['pos_type']}";
             if (is_dir(base_path($posMigrationPath))) {
                 Artisan::call('migrate', [

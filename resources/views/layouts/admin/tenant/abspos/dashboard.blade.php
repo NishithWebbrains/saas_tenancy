@@ -6,7 +6,7 @@
 @section('content')
   <div class="row">
     <div class="col-lg-12">
-      <h4>Welcome to Store {{ $tenantId }}</h4>
+    <h4>Welcome to Store <b>{{ $tenantDetails->pluck('name')->first() }}</b></h4>
     </div>
   </div>
 

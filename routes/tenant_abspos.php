@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Models\Product;
+use App\Models\Tenant\TenantDetail;
 use Stancl\Tenancy\Middleware\InitializeTenancyByPath;
 
 Route::middleware([
@@ -12,9 +13,10 @@ Route::middleware([
 ])->prefix('/{tenant}/abspos')->group(function () {
     Route::get('/dashboard', function () {
         $products = Product::all();
+        $tenantDetails = TenantDetail::all();
 
         return view('layouts.admin.tenant.abspos.dashboard', [
-            'tenantId' => tenant('id'),
+            'tenantDetails' => $tenantDetails,
             'products' => $products,
         ]);
     })->name('tenant.abspos.dashboard');

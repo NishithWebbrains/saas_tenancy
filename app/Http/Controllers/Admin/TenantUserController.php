@@ -18,9 +18,28 @@ class TenantUserController extends Controller
      */
     public function createuser()
     {
-       $tenants = auth()->user()->tenants; 
+       //$tenants = auth()->user()->tenants; 
+       $tenants = auth()->user()->tenants; // Central connection
+       $tenantList = [];
+   
+       foreach ($tenants as $tenant) {
+           // Switch to tenant DB connection (using tenancy-for-laravel)
+           tenancy()->initialize($tenant);
+   
+           // Manually fetch details from tenant DB
+           $details = \App\Models\Tenant\TenantDetail::first();
+           
+           // Prepare each tenant for view
+           $tenantList[] = [
+               'id' => $tenant->id,
+               'name' => $details ? $details->name : 'No Name',
+               // Add other desired properties here
+           ];
+   
+           tenancy()->end(); // Restore central connection
+       }
        //dd($tenants);
-        return view('layouts.admin.stores.createuser', compact('tenants'));
+        return view('layouts.admin.stores.createuser', compact('tenantList'));
     }
 
     public function viewusers()
