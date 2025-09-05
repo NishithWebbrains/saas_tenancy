@@ -1,8 +1,10 @@
 <?php
+// app/Http/Controllers/POS/AbsPos/Auth/AuthenticatedSessionController.php
+
 namespace App\Http\Controllers\POS\AbsPos\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\POS\AbsPosLoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,45 +14,42 @@ class AuthenticatedSessionController extends Controller
 {
     public function create(): View
     {
-        // Use ABS POS specific login view
-        return view('abspos.auth.login');
+        return view('layouts.tenant.abspos.auth.login');
     }
 
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(AbsPosLoginRequest $request): RedirectResponse
     {
-        // Make sure LoginRequest authenticates using abspos guard
-        $request->authenticate('abspos'); // if you have a guard parameter
-
+        $request->authenticate();
         $request->session()->regenerate();
 
-        $user = $request->user('abspos');
+        $user = Auth::guard('abspos')->user();
 
-        if ($user->hasRole('superadmin')) {
-            return redirect()->route('abspos.admin.store-users.index');
-        }
+        // Redirect based on user roles
+        // if ($user->hasRole('superadmin')) {
+        //     return redirect()->route('abspos.admin.store-users.index');
+        // }
 
-        if ($user->hasRole('storeadmin')) {
-            return redirect()->route('abspos.stores.index');
-        }
+        // if ($user->hasRole('storeadmin')) {
+        //     return redirect()->route('abspos.stores.index');
+        // }
+
         if ($user->hasRole('staff')) {
-            return redirect()->route('abspos.admin.dashboard');
+            return redirect()->route('layouts.tenant.abspos.dashboard');
         }
 
         if ($user->hasRole('manager')) {
-            return redirect()->route('abspos.admin.dashboard');
+            return redirect()->route('layouts.tenant.abspos.dashboard');
         }
 
-        return redirect()->intended('/abspos'); // Default ABS POS dashboard
+        return redirect()->intended('/abspos/dashboard');
     }
 
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('abspos')->logout();
-
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
-        return redirect('/abspos/login');
+        return redirect('/abspos/auth/login');
     }
 }

@@ -6,8 +6,10 @@ use App\Models\Store;
 use App\Models\Tenant;
 use App\Models\User;
 use App\Models\Tenant\TenantDetail;
+use App\Models\Tenant\TenantUser;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Hash;
 
 class CreateStoreAndTenantService
 {
@@ -33,7 +35,26 @@ class CreateStoreAndTenantService
                 'slug'      => $payload['slug'],
                 'pos_type'  => $payload['pos_type'],
             ]);
+        // });
+        // $tenant->run(function () use ($payload, $tenant) {
+            // Store tenant details
+            TenantUser::create([
+                'name' => 'Store1 Manager',
+                'email' => 'store1@manager.com',
+                'password' => Hash::make('password'),
+                'pos_type' => $payload['pos_type'],
+                'roles' => ['manager'],
+            ]);
+
+            TenantUser::create([
+                'name' => 'store1 Staff',
+                'email' => 'store1@staff.com',
+                'password' => Hash::make('password'),
+                'pos_type' => $payload['pos_type'],
+                'roles' => ['staff'],
+            ]);
         });
+        
         // Central "Store" record
         $store = Store::create([
             'name'          => $payload['name'],

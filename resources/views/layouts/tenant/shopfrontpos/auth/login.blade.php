@@ -36,7 +36,7 @@
                 <img src="{{ asset('admin/dist/img/-new-logo.png') }}" alt="Elabels Logo"
                       width="250px" style="opacity: .8">
             </div>
-            <p class="login-box-msg">Welcome to Elabels Store - {{ $tenantDetails->pluck('name')->first() }}</p>
+            <p class="login-box-msg">Welcome to Elabels Integration</p>
             <h4 class="login-box-msg">Sign In</h4>
 
             {{-- Show session status (like logout success) --}}

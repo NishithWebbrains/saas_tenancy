@@ -77,15 +77,15 @@ return [
 
         'shopfrontpos_users' => [
             'driver' => 'eloquent',
-            'model' => App\Models\ShopfrontUser::class,
+            'model' => App\Models\Tenant\TenantUser::class,
         ],
         'swiftpos_users' => [
             'driver' => 'eloquent',
-            'model' => App\Models\SwiftPOSUser::class,
+            'model' => App\Models\Tenant\TenantUser::class,
         ],
         'abspos_users' => [
             'driver' => 'eloquent',
-            'model' => App\Models\ABSPosUser::class,
+            'model' => App\Models\Tenant\TenantUser::class,
         ],
         'users' => [
             'driver' => 'eloquent',
@@ -121,6 +121,12 @@ return [
         'users' => [
             'provider' => 'users',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'tenant_users' => [
+            'provider' => 'shopfrontpos_users', // You can use any of the tenant providers
+            'table' => 'password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,
         ],

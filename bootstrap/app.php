@@ -20,6 +20,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'superadmin' => EnsureSuperadmin::class, // ✅ register here
             'tenant.access' => \App\Http\Middleware\CheckTenantAccess::class,
             'tenant' => \App\Http\Middleware\TenantMiddleware::class,
+            'auth.shopfrontpos' => \App\Http\Middleware\POS\AuthenticateShopfrontPos::class,
+            'auth.swiftpos' => \App\Http\Middleware\POS\AuthenticateSwiftPos::class,
+            'auth.abspos' => \App\Http\Middleware\POS\AuthenticateAbsPos::class,
 
         ]);
     })

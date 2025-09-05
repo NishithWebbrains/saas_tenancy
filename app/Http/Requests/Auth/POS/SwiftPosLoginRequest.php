@@ -1,6 +1,7 @@
 <?php
+// app/Http/Requests/Auth/SwiftPosLoginRequest.php
 
-namespace App\Http\Requests\Auth;
+namespace App\Http\Requests\Auth\POS;
 
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
@@ -9,21 +10,13 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
-class ShopfrontPosLoginRequest extends FormRequest
+class SwiftPosLoginRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
@@ -32,16 +25,20 @@ class ShopfrontPosLoginRequest extends FormRequest
         ];
     }
 
-    /**
-     * Attempt to authenticate the request's credentials with the abspos guard.
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
     public function authenticate(): void
     {
+       
         $this->ensureIsNotRateLimited();
+        
+        $credentials = $this->only('email', 'password');
+        
+        // Add POS type check to credentials
+        $credentials['pos_type'] = 'swiftpos';
+        
+        \Log::debug('Using DB connection:', ['connection' => config('database.default')]);
 
-        if (! Auth::guard('shopfrontpos')->attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        if (!Auth::guard('swiftpos')->attempt($credentials, $this->boolean('remember'))) {
+            \Log::debug('Auth attempt failed', ['credentials' => $credentials]);
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -49,22 +46,17 @@ class ShopfrontPosLoginRequest extends FormRequest
             ]);
         }
 
+       
         RateLimiter::clear($this->throttleKey());
     }
 
-    /**
-     * Ensure the login request is not rate limited.
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
     public function ensureIsNotRateLimited(): void
     {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+        if (!RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
             return;
         }
 
         event(new Lockout($this));
-
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
@@ -75,9 +67,6 @@ class ShopfrontPosLoginRequest extends FormRequest
         ]);
     }
 
-    /**
-     * Get the rate limiting throttle key for the request.
-     */
     public function throttleKey(): string
     {
         return Str::transliterate(Str::lower($this->string('email')) . '|' . $this->ip());
