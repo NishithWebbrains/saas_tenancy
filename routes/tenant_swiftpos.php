@@ -7,7 +7,6 @@ use Stancl\Tenancy\Middleware\InitializeTenancyByPath;
 use App\Http\Controllers\POS\SwiftPos\Auth\AuthenticatedSessionController;
 
 // Auth routes (no middleware required)
-
 Route::middleware([
     'web',
     InitializeTenancyByPath::class,
