@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
+use App\Models\Tenant;
 use App\Models\Store;
+use App\Models\Tenant\TenantUser;
 use App\Services\CreateStoreAndTenantService;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
@@ -88,30 +90,49 @@ class StoreController extends Controller
 
     public function getData()
     {
-        $query = Store::query();
+        try {
+            $query = Store::query();
 
-        if (auth()->user()->hasRole('storeadmin')) {
-            $query->where('owner_user_id', auth()->id());
+            if (auth()->user()->hasRole('storeadmin')) {
+                $query->where('owner_user_id', auth()->id());
+            }
+
+            return DataTables::of($query)
+                ->addIndexColumn()
+                ->addColumn('users', function ($store) {
+                    $tenant = Tenant::find($store->tenant_id);
+                    $usersList = '';
+                    if ($tenant) {
+                        $usersList = $tenant->run(function () {
+                            return TenantUser::pluck('email')->implode(', ');
+                        });
+                    }
+                    return $usersList;
+                })
+                ->addColumn('actions', function ($store) {
+                    $editUrl = route('stores.edit', $store);
+                    $deleteUrl = route('stores.destroy', $store);
+
+                    return '
+                        <a href="'.$editUrl.'" class="btn btn-sm btn-warning">Edit</a>
+                        <form action="'.$deleteUrl.'" method="POST" style="display:inline-block;">
+                            '.csrf_field().method_field('DELETE').'
+                            <button type="submit" class="btn btn-sm btn-danger"
+                                onclick="return confirm(\'Delete this store?\')">Delete</button>
+                        </form>
+                    ';
+                })
+                ->rawColumns(['users', 'actions'])
+                ->make(true);
+        } catch (\Exception $e) {
+            \Log::error('DataTables stores getData error: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            // Optionally return an empty JSON response or error message to AJAX
+            return response()->json(['error' => 'Data fetch error. Please check logs.'], 500);
         }
-
-        return DataTables::of($query)
-            ->addIndexColumn()
-            ->addColumn('actions', function ($store) {
-                $editUrl = route('stores.edit', $store);
-                $deleteUrl = route('stores.destroy', $store);
-
-                return '
-                    <a href="'.$editUrl.'" class="btn btn-sm btn-warning">Edit</a>
-                    <form action="'.$deleteUrl.'" method="POST" style="display:inline-block;">
-                        '.csrf_field().method_field('DELETE').'
-                        <button type="submit" class="btn btn-sm btn-danger"
-                            onclick="return confirm(\'Delete this store?\')">Delete</button>
-                    </form>
-                ';
-            })
-            ->rawColumns(['actions'])
-            ->make(true);
     }
+
 
     public function show(Store $store)
     {

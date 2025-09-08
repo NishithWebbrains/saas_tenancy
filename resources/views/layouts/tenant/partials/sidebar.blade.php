@@ -10,23 +10,23 @@
       <!-- copy nav markup from index.html or build your menu -->
       <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" id="navigation">
         <li class="nav-item menu-open">
-          <a href="{{ route('admin.dashboard') }}" class="nav-link active">
+          <a href="" class="nav-link active">
             <i class="nav-icon bi bi-speedometer"></i>
             <p>Dashboard <i class="nav-arrow bi bi-chevron-right"></i></p>
           </a>
         </li>
-        <li class="nav-item menu-open">
+        <!-- <li class="nav-item menu-open">
           <a href="{{ route('stores.index') }}" class="nav-link active">
             <i class="nav-icon bi bi-speedometer"></i>
             <p>Stores</p>
           </a>
-        </li>
-        <li class="nav-item menu-open">
+        </li> -->
+        <!-- <li class="nav-item menu-open">
           <a href="{{ route('stores.viewusers') }}" class="nav-link active">
             <i class="nav-icon bi bi-speedometer"></i>
             <p>Store Users</p>
           </a>
-        </li>
+        </li> -->
         <!-- more items -->
       </ul>
     </nav>

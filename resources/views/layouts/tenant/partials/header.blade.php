@@ -22,14 +22,17 @@
       </li>
     </ul>
     <div class="d-flex">
-            @auth
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="btn btn-outline-danger btn-sm">Logout</button>
+            @php
+                $tenantId = request()->route('tenant')
+                ?? request()->segment(1)
+                ?? request()->input('tenant')
+                ?? null;
+            @endphp
+                <form method="POST" action="{{ route('swiftpos.logout', ['tenant' => $tenantId]) }}">
+                @csrf
+                  <button type="submit" class="btn btn-outline-danger btn-sm">Logout</button>
                 </form>
-            @else
-                <a href="{{ route('login') }}" class="btn btn-primary btn-sm">Login</a>
-            @endauth
+          
         </div>
   </div>
 </nav>

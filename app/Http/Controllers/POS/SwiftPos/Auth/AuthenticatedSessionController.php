@@ -57,10 +57,15 @@ class AuthenticatedSessionController extends Controller
 
     public function destroy(Request $request): RedirectResponse
     {
-        Auth::guard('swiftpos')->logout();
+        $tenantId = request()->route('tenant')
+        ?? request()->segment(1)
+        ?? request()->input('tenant')
+        ?? null;
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
-        return redirect('/swiftpos/auth/login');
+        
+        Auth::guard('swiftpos')->logout();
+       
+        return redirect()->route('swiftpos.login', ['tenant' => $tenantId]);
     }
 }

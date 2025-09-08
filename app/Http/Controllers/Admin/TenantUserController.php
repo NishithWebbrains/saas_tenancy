@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Store;
 use App\Models\Tenant;
+use App\Models\Tenant\TenantUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -133,48 +134,42 @@ class TenantUserController extends Controller
             ]);
             $user->assignRole($request->role);
 
-
-            \Log::info("✅ Created central user", ['id' => $user->id, 'email' => $user->email]);
-
+            
             // Step 2: Assign user into selected tenant databases
-            foreach ($request->tenants as $tenantId) {
+        foreach ($request->tenants as $tenantId) {
             $tenant = Tenant::find($tenantId);
+                //taking tenants pos_type...
+                $tenantDbName = $tenant->tenancy_db_name;
+                $defaultConnection = config('database.connections.mysql');
+                $dynamicConnection = $defaultConnection;
+                $dynamicConnection['database'] = $tenantDbName;
+                config(["database.connections.tenant_dynamic" => $dynamicConnection]);
 
+                // 2. Query tenant_details table in the dynamic DB
+                $posType = DB::connection('tenant_dynamic')
+                    ->table('tenant_details')
+                    ->value('pos_type');
+          
             if (!$tenant) {
                 \Log::warning("⚠️ Tenant not found", ['tenant_id' => $tenantId]);
                 continue;
             }
-
-            \Log::info("➡️ Assigning user to tenant", ['tenant_id' => $tenant->id]);
-
-            try {
-                $tenant->run(function () use ($user, $request, $tenant) {
-                    DB::table('tenant_users')->insert([
-                        'user_id'    => $user->id,
-                        'role'       => $request->role,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-
-                    \Log::info("✅ Inserted into tenant_users", [
-                        'tenant_id' => $tenant->id,
-                        'user_id'   => $user->id,
-                    ]);
-                });
-            } catch (\Exception $e) {
-                \Log::error("❌ Failed inserting into tenant_users", [
-                    'tenant_id' => $tenant->id,
-                    'user_id'   => $user->id,
-                    'error'     => $e->getMessage(),
+            $tenant->run(function () use ($request, $tenant,$posType) {
+                TenantUser::create([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'password' => Hash::make($request->password),
+                    'pos_type' => $posType,
+                    'roles' => [$request->role],
                 ]);
+            });
+            \Log::info("✅ Created tenant user", ['id' => $user->id, 'email' => $user->email]);
 
-                dd("Error inserting into tenant {$tenant->id}", $e->getMessage());
-            }
+
+            // \Log::info("➡️ Assigning user to tenant", ['tenant_id' => $tenant->id]);
         }
-
-
-            return redirect()->route('stores.viewusers')
-                ->with('success', 'User created in central DB and assigned to selected tenants.');
+        return redirect()->route('stores.index')
+                         ->with('success', 'User created in central DB and assigned to selected tenants.');
     }
 
 

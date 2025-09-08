@@ -11,6 +11,7 @@
                 <th>Sr No.</th>
                 <th>Name</th>
                 <th>Slug</th>
+                <th>Users</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -29,6 +30,7 @@ $(function () {
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
             { data: 'name', name: 'name' },
             { data: 'slug', name: 'slug' },
+            { data: 'users', name: 'users', orderable: false, searchable: false },
             { data: 'actions', name: 'actions', orderable: false, searchable: false }
         ]
     });
