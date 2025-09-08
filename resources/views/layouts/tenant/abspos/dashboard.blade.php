@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.tenant.abspos.abspos')
 
 @section('title', 'Dashboard')
 @section('page-title', 'Dashboard')

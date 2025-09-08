@@ -8,7 +8,7 @@ use Stancl\Tenancy\Database\Models\Domain;
 class Store extends Model
 {
     protected $guarded = [];
-
+    protected $connection = 'central';
     public function tenant()
     {
         return $this->belongsTo(Tenant::class, 'tenant_id', 'id');

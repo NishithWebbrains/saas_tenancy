@@ -28,9 +28,9 @@
 </head>
 <body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
 <div class="app-wrapper">
-    @include('layouts.tenant.partials.header')
+    @include('layouts.tenant.shopfrontpos.partials.header')
 
-    @include('layouts.tenant.partials.sidebar')
+    @include('layouts.tenant.shopfrontpos.partials.sidebar')
 
     <main class="app-main">
         <div class="app-content-header">
@@ -53,7 +53,7 @@
         </div>
     </main>
 
-    @include('layouts.tenant.partials.footer')
+    @include('layouts.tenant.shopfrontpos.partials.footer')
 </div>
 
 <!-- Scripts (some kept via CDN as in theme) -->

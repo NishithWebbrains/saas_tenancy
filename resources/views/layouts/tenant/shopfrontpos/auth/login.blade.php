@@ -5,16 +5,16 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Elabels - Electronic Shelf Label Manufacturer | ESL Australia</title>
-    <link rel="icon" type="image/x-icon" href="{{ asset('admin/dist/img/fav-logo.png') }}"/>
+    <link rel="icon" type="image/x-icon" href="{{ url('admin/dist/img/fav-logo.png') }}"/>
 
     <!-- Google Font -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="{{ asset('admin/plugins/fontawesome-free/css/all.min.css') }}">
+    <link rel="stylesheet" href="{{ url('admin/plugins/fontawesome-free/css/all.min.css') }}">
     <!-- icheck bootstrap -->
-    <link rel="stylesheet" href="{{ asset('admin/plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url('admin/plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
     <!-- Theme style -->
-    <link rel="stylesheet" href="{{ asset('admin/dist/css/adminlte.min.css') }}">
+    <link rel="stylesheet" href="{{ url('admin/dist/css/adminlte.min.css') }}">
 
     <style>
         .login_new_card {
@@ -33,7 +33,7 @@
     <div class="card">
         <div class="card-body login-card-body">
             <div class="login-logo">
-                <img src="{{ asset('admin/dist/img/-new-logo.png') }}" alt="Elabels Logo"
+                <img src="{{ url('admin/dist/img/-new-logo.png') }}" alt="Elabels Logo"
                       width="250px" style="opacity: .8">
             </div>
             <p class="login-box-msg">Welcome to Elabels Integration</p>
@@ -57,7 +57,13 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('login') }}">
+            @php
+                $tenantId = request()->route('tenant')
+                ?? request()->segment(1)
+                ?? request()->input('tenant')
+                ?? null;
+            @endphp
+            <form method="POST" action="{{ route('shopfrontpos.login.submit', ['tenant' => $tenantId])  }}">
                 @csrf
 
                 {{-- Email --}}
@@ -121,11 +127,11 @@
 </div>
 
 <!-- jQuery -->
-<script src="{{ asset('admin/plugins/jquery/jquery.min.js') }}"></script>
+<script src="{{ url('admin/plugins/jquery/jquery.min.js') }}"></script>
 <!-- Bootstrap 4 -->
-<script src="{{ asset('admin/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ url('admin/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 <!-- AdminLTE App -->
-<script src="{{ asset('admin/dist/js/adminlte.min.js') }}"></script>
+<script src="{{ url('admin/dist/js/adminlte.min.js') }}"></script>
 
 <script>
     // Password toggle eye

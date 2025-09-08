@@ -1,4 +1,4 @@
-@extends('layouts.tenant.tenant')
+@extends('layouts.tenant.swiftpos.swiftpos')
 
 @section('title', 'Dashboard')
 @section('page-title', 'Dashboard')

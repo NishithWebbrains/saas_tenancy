@@ -33,12 +33,16 @@ class AuthenticatedSessionController extends Controller
         //     return redirect()->route('abspos.stores.index');
         // }
 
+        $tenantId = request()->route('tenant')
+        ?? request()->segment(1)
+        ?? request()->input('tenant')
+        ?? null;
         if ($user->hasRole('staff')) {
-            return redirect()->route('layouts.tenant.abspos.dashboard');
+            return redirect()->route('abspos.dashboard', ['tenant' => $tenantId]);
         }
 
         if ($user->hasRole('manager')) {
-            return redirect()->route('layouts.tenant.abspos.dashboard');
+            return redirect()->route('abspos.dashboard', ['tenant' => $tenantId]);
         }
 
         return redirect()->intended('/abspos/dashboard');
@@ -46,10 +50,15 @@ class AuthenticatedSessionController extends Controller
 
     public function destroy(Request $request): RedirectResponse
     {
-        Auth::guard('abspos')->logout();
+        $tenantId = request()->route('tenant')
+        ?? request()->segment(1)
+        ?? request()->input('tenant')
+        ?? null;
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/abspos/auth/login');
+        Auth::guard('abspos')->logout();
+
+        return redirect()->route('abspos.login', ['tenant' => $tenantId]);
     }
 }

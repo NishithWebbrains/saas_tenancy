@@ -32,13 +32,16 @@ class AuthenticatedSessionController extends Controller
         // if ($user->hasRole('storeadmin')) {
         //     return redirect()->route('shopfrontpos.stores.index');
         // }
-
+        $tenantId = request()->route('tenant')
+        ?? request()->segment(1)
+        ?? request()->input('tenant')
+        ?? null;
         if ($user->hasRole('staff')) {
-            return redirect()->route('layouts.tenant.shopfrontpos.dashboard');
+            return redirect()->route('shopfrontpos.dashboard', ['tenant' => $tenantId]);
         }
 
         if ($user->hasRole('manager')) {
-            return redirect()->route('layouts.tenant.shopfrontpos.dashboard');
+            return redirect()->route('shopfrontpos.dashboard', ['tenant' => $tenantId]);
         }
 
         return redirect()->intended('/shopfrontpos/dashboard');
@@ -46,10 +49,15 @@ class AuthenticatedSessionController extends Controller
 
     public function destroy(Request $request): RedirectResponse
     {
-        Auth::guard('shopfrontpos')->logout();
+        $tenantId = request()->route('tenant')
+        ?? request()->segment(1)
+        ?? request()->input('tenant')
+        ?? null;
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/shopfrontpos/auth/login');
+        Auth::guard('shopfrontpos')->logout();
+        
+        return redirect()->route('shopfrontpos.login', ['tenant' => $tenantId]);
     }
 }

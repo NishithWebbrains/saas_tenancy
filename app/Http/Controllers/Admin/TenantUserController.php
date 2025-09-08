@@ -127,12 +127,12 @@ class TenantUserController extends Controller
             ]);
 
             // Step 1: Create central user
-            $user = User::create([
-                'name'     => $request->name,
-                'email'    => $request->email,
-                'password' => Hash::make($request->password),
-            ]);
-            $user->assignRole($request->role);
+            // $user = User::create([
+            //     'name'     => $request->name,
+            //     'email'    => $request->email,
+            //     'password' => Hash::make($request->password),
+            // ]);
+            // $user->assignRole($request->role);
 
             
             // Step 2: Assign user into selected tenant databases
@@ -163,9 +163,7 @@ class TenantUserController extends Controller
                     'roles' => [$request->role],
                 ]);
             });
-            \Log::info("✅ Created tenant user", ['id' => $user->id, 'email' => $user->email]);
-
-
+           
             // \Log::info("➡️ Assigning user to tenant", ['tenant_id' => $tenant->id]);
         }
         return redirect()->route('stores.index')

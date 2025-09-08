@@ -7,16 +7,18 @@ use Stancl\Tenancy\Middleware\InitializeTenancyByPath;
 use App\Http\Controllers\POS\ShopfrontPos\Auth\AuthenticatedSessionController;
 
 // Auth routes (no middleware required)
-Route::prefix('/{tenant}/shopfrontpos')->group(function () {
+Route::middleware([
+    'web',
+    InitializeTenancyByPath::class,
+])->prefix('/{tenant}/shopfrontpos')->group(function () {
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('shopfrontpos.login');
-    Route::post('/login', [AuthenticatedSessionController::class, 'store']);
+    Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('shopfrontpos.login.submit');
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('shopfrontpos.logout');
 });
 
 Route::middleware([
     'web',
-    'auth',
-    'tenant.access',
+    'auth.shopfrontpos',
     InitializeTenancyByPath::class,
 ])->prefix('/{tenant}/shopfrontpos')->group(function () {
     Route::get('/dashboard', function () {
@@ -27,5 +29,5 @@ Route::middleware([
             'tenantDetails' => $tenantDetails,
             'products' => $products,
         ]);
-    })->name('tenant.shopfrontpos.dashboard');
+    })->name('shopfrontpos.dashboard');
 });

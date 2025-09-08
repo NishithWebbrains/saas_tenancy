@@ -9,17 +9,33 @@ class AuthenticateShopfrontPos
 {
     public function handle($request, Closure $next)
     {
-        if (!Auth::guard('shopfrontpos')->check()) {
-            return redirect()->route('shopfrontpos.login');
-        }
-        
-         // Additional check to ensure user belongs to current tenant's ABS POS
-         $user = Auth::guard('shopfrontpos')->user();
-         if ($user->pos_type !== 'shopfrontpos') {
-             Auth::guard('shopfrontpos')->logout();
-             return redirect()->route('shopfrontpos.login')->with('error', 'Access denied.');
-         }
+        $tenant = $request->route('tenant')
+            ?? $request->segment(1)
+            ?? $request->input('tenant')
+            ?? null;
 
-        return $next($request);
+        // Check tenant-specific guard first
+        if (Auth::guard('shopfrontpos')->check()) {
+            $user = Auth::guard('shopfrontpos')->user();
+            if ($user->pos_type !== 'shopfrontpos') {
+                Auth::guard('shopfrontpos')->logout();
+                return redirect()->route('shopfrontpos.login', ['tenant' => $tenant])->with('error', 'Access denied.');
+            }
+            return $next($request);
+        }
+
+        //Check central DB guard for superadmin/storeadmin
+        if (Auth::guard('web')->check()) {
+            $centralUser = Auth::guard('web')->user();
+            if (
+                $centralUser->hasRole('superadmin')
+                || $centralUser->hasRole('storeadmin')
+            ) {
+                // Optionally: you could also add audit logging here
+                return $next($request);
+            }
+        }
+
+        return redirect()->route('shopfrontpos.login', ['tenant' => $tenant]);
     }
 }

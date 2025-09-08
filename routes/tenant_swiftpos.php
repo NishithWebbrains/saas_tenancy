@@ -19,7 +19,6 @@ Route::middleware([
 
 Route::middleware([
     'web',
-    
     'auth.swiftpos',
     InitializeTenancyByPath::class,
 ])->prefix('/{tenant}/swiftpos')->group(function () {
