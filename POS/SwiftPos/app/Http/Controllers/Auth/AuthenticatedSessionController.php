@@ -1,7 +1,7 @@
 <?php
 // app/Http/Controllers/POS/AbsPos/Auth/AuthenticatedSessionController.php
 
-namespace App\Http\Controllers\POS\SwiftPos\Auth;
+namespace POS\SwiftPos\App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\POS\SwiftPosLoginRequest;

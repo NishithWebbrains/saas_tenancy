@@ -4,8 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Models\Product;
 use App\Models\Tenant\TenantDetail;
 use Stancl\Tenancy\Middleware\InitializeTenancyByPath;
-use App\Http\Controllers\POS\SwiftPos\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\POS\SwiftPos\Admin\PosUsersController;
+use POS\SwiftPos\App\Http\Controllers\Auth\AuthenticatedSessionController;
+use POS\SwiftPos\App\Http\Controllers\Admin\PosUsersController;
 
 // Auth routes (no middleware required)
 Route::middleware([
