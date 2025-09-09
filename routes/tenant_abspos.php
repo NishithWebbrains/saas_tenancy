@@ -5,6 +5,7 @@ use App\Models\Product;
 use App\Models\Tenant\TenantDetail;
 use Stancl\Tenancy\Middleware\InitializeTenancyByPath;
 use App\Http\Controllers\POS\AbsPos\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\POS\AbsPos\Admin\PosUsersController;
 
 // Auth routes (no middleware required)
 Route::middleware([
@@ -25,9 +26,13 @@ Route::middleware([
         $products = Product::all();
         $tenantDetails = TenantDetail::all();
 
-        return view('layouts.tenant.abspos.dashboard', [
-            'tenantDetails' => $tenantDetails,
-            'products' => $products,
-        ]);
-    })->name('abspos.dashboard');
+            return view('layouts.tenant.abspos.dashboard', [
+                'tenantDetails' => $tenantDetails,
+                'products' => $products,
+            ]);
+        })->name('abspos.dashboard');
+    Route::get('/posusers', [PosUsersController::class, 'view'])->name('abspos.posusers');
+    Route::get('createuser', [PosUsersController::class, 'createuser'])->name('abspos.createuser');
+    Route::post('/storeuser', [PosUsersController::class, 'storeuser'])->name('abspos.storeuser');
+    Route::get('/storeusersdata', [PosUsersController::class, 'storeusersdata'])->name('abspos.storeusersdata');
 });

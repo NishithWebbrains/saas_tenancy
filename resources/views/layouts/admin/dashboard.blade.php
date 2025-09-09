@@ -7,7 +7,7 @@
   <div class="row">
     <div class="col-lg-3 col-6">
       <div class="small-box text-bg-primary">
-        <div class="inner"><h3>150</h3><p>New Orders</p></div>
+        <div class="inner"><h3>{{ $storeCount }}</h3><p>Stores</p></div>
         <a href="#" class="small-box-footer link-light">More info <i class="bi bi-link-45deg"></i></a>
       </div>
     </div>

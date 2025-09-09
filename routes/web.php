@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController;
 
-use App\Http\Controllers\Admin\TenantUserController;
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
@@ -16,7 +15,7 @@ require __DIR__.'/auth.php';
 
 // Override GET /login to force logout first
 Route::get('/login', function (Request $request) {
-    //dd("sdd");
+    
     if (Auth::check()) {
         // Logout current user
         Auth::logout();
@@ -67,12 +66,8 @@ Route::middleware(['auth'])->group(function () {
 
 // Storeadmin-only area
 Route::middleware(['auth'])->group(function () {
-
-    Route::get('stores/viewusers', [TenantUserController::class, 'viewusers'])->name('stores.viewusers');
-    Route::get('stores/storeusersdata', [TenantUserController::class, 'storeusersdata'])->name('stores.storeusersdata');
-    Route::get('stores/createuser', [TenantUserController::class, 'createuser'])->name('stores.createuser');
-    Route::post('stores/storeuser', [TenantUserController::class, 'storeuser'])->name('stores.storeuser');
     Route::get('stores/data', [StoreController::class, 'getData'])->name('stores.data');
+    Route::get('/stores/data/count', [StoreController::class, 'getDataCount'])->name('stores.data.count');
     Route::resource('stores', StoreController::class);
 });
 

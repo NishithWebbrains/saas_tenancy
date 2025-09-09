@@ -5,6 +5,7 @@ use App\Models\Product;
 use App\Models\Tenant\TenantDetail;
 use Stancl\Tenancy\Middleware\InitializeTenancyByPath;
 use App\Http\Controllers\POS\ShopfrontPos\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\POS\ShopfrontPos\Admin\PosUsersController;
 
 // Auth routes (no middleware required)
 Route::middleware([
@@ -25,9 +26,13 @@ Route::middleware([
         $products = Product::all();
         $tenantDetails = TenantDetail::all();
 
-        return view('layouts.tenant.shopfrontpos.dashboard', [
-            'tenantDetails' => $tenantDetails,
-            'products' => $products,
-        ]);
-    })->name('shopfrontpos.dashboard');
+            return view('layouts.tenant.shopfrontpos.dashboard', [
+                'tenantDetails' => $tenantDetails,
+                'products' => $products,
+            ]);
+        })->name('shopfrontpos.dashboard');
+    Route::get('/posusers', [PosUsersController::class, 'view'])->name('shopfrontpos.posusers');
+    Route::get('createuser', [PosUsersController::class, 'createuser'])->name('shopfrontpos.createuser');
+    Route::post('/storeuser', [PosUsersController::class, 'storeuser'])->name('shopfrontpos.storeuser');
+    Route::get('/storeusersdata', [PosUsersController::class, 'storeusersdata'])->name('shopfrontpos.storeusersdata');
 });

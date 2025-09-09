@@ -15,18 +15,24 @@
             <p>Dashboard <i class="nav-arrow bi bi-chevron-right"></i></p>
           </a>
         </li>
+      
+      
         <li class="nav-item menu-open">
           <a href="{{ route('stores.index') }}" class="nav-link active">
             <i class="nav-icon bi bi-speedometer"></i>
             <p>Stores</p>
           </a>
         </li>
-        <!-- <li class="nav-item menu-open">
-          <a href="{{ route('stores.viewusers') }}" class="nav-link active">
+
+      @if(Auth::user() && Auth::user()->hasRole('superadmin'))
+        <li class="nav-item menu-open">
+          <a href="{{ route('admin.store-users.index') }}" class="nav-link active">
             <i class="nav-icon bi bi-speedometer"></i>
-            <p>Store Users</p>
+            <p>Store Admins</p>
           </a>
-        </li> -->
+        </li>
+      @endif
+
         <!-- more items -->
       </ul>
     </nav>

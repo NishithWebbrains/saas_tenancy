@@ -4,7 +4,7 @@
 <div class="container">
     <h2>Stores</h2>
     <a href="{{ route('stores.create') }}" class="btn btn-primary mb-3">+ Add Store</a>
-    <a href="{{ route('stores.createuser') }}" class="btn btn-primary mb-3">+ Add User</a>
+    
     <table class="table table-bordered" id="stores-table">
         <thead>
             <tr>

@@ -21,12 +21,7 @@
             <p>Stores</p>
           </a>
         </li> -->
-        <!-- <li class="nav-item menu-open">
-          <a href="{{ route('stores.viewusers') }}" class="nav-link active">
-            <i class="nav-icon bi bi-speedometer"></i>
-            <p>Store Users</p>
-          </a>
-        </li> -->
+        
         <!-- more items -->
       </ul>
     </nav>

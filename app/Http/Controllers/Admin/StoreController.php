@@ -132,7 +132,27 @@ class StoreController extends Controller
             return response()->json(['error' => 'Data fetch error. Please check logs.'], 500);
         }
     }
+    public function getDataCount()
+    {
+        try {
+            $query = Store::query();
 
+            // Apply the same filter as in getData
+            if (auth()->user()->hasRole('storeadmin')) {
+                $query->where('owner_user_id', auth()->id());
+            }
+
+            // Count the number of items
+            $count = $query->count();
+
+            return response()->json(['count' => $count], 200);
+        } catch (\Exception $e) {
+            \Log::error('DataTables stores getDataCount error: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json(['error' => 'Data count error. Please check logs.'], 500);
+        }
+    }
 
     public function show(Store $store)
     {

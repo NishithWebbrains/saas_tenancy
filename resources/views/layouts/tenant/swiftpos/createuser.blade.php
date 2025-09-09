@@ -1,10 +1,15 @@
-@extends('layouts.admin')
+@extends('layouts.tenant.swiftpos.swiftpos')
 
 @section('content')
 <div class="container">
     <h2>Add User</h2>
-
-<form action="{{ route('stores.storeuser') }}" method="POST">
+            @php
+                $tenantId = request()->route('tenant')
+                ?? request()->segment(1)
+                ?? request()->input('tenant')
+                ?? null;
+            @endphp
+<form action="{{ route('swiftpos.storeuser', ['tenant' => $tenantId]) }}" method="POST">
     @csrf
     <div>
         <label>Name:</label>
@@ -28,18 +33,8 @@
             <option value="manager">Manager</option>
         </select>
     </div>
-
-    <div class="form-group">
-        <label>Assign Tenants:</label>
-        <div>
-            @foreach($tenantList as $tenant)
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" name="tenants[]" id="tenant_{{ $tenant['id'] }}" value="{{ $tenant['id'] }}">
-                    &nbsp; <label class="form-check-label" for="tenant_{{ $tenant['id'] }}" style="font-size: 1.2em;">{{ $tenant['name'] }}</label>
-                </div>
-            @endforeach
-        </div>
-    </div>
+    <br>
+    
 
     <button class="btn btn-success" type="submit">Create User</button>
 </form>
