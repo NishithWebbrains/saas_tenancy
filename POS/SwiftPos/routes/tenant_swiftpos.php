@@ -1,13 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Models\Product;
-use App\Models\Tenant\TenantDetail;
+use POS\SwiftPos\App\Models\Product;
+use POS\SwiftPos\App\Models\TenantDetail;
 use Stancl\Tenancy\Middleware\InitializeTenancyByPath;
 use POS\SwiftPos\App\Http\Controllers\Auth\AuthenticatedSessionController;
 use POS\SwiftPos\App\Http\Controllers\Admin\PosUsersController;
 
-// Auth routes (no middleware required)
 Route::middleware([
     'web',
     InitializeTenancyByPath::class,

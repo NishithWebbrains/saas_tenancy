@@ -12,7 +12,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         api: __DIR__.'/../routes/api.php',
-        commands: __DIR__.'/../routes/console.php',
+        commands: __DIR__.'/../POS/SwiftPos/routes/console.php',
+        //tenant_swiftpos: __DIR__.'/../POS/SwiftPos/routes/tenant_swiftpos.php',
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
@@ -21,7 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'tenant.access' => \App\Http\Middleware\CheckTenantAccess::class,
             'tenant' => \App\Http\Middleware\TenantMiddleware::class,
             'auth.shopfrontpos' => \App\Http\Middleware\POS\AuthenticateShopfrontPos::class,
-            'auth.swiftpos' => \App\Http\Middleware\POS\AuthenticateSwiftPos::class,
+            'auth.swiftpos' => POS\SwiftPos\App\Http\Middleware\AuthenticateSwiftPos::class,
             'auth.abspos' => \App\Http\Middleware\POS\AuthenticateAbsPos::class,
 
         ]);
