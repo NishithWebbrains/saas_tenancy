@@ -1,10 +1,10 @@
 <?php
 // app/Http/Controllers/POS/AbsPos/Auth/AuthenticatedSessionController.php
 
-namespace POS\SwiftPos\App\Http\Controllers\Auth;
+namespace POS\ShopfrontPos\App\Http\Controllers\Auth;
 
-use POS\SwiftPos\App\Http\Controllers\Controller;
-use POS\SwiftPos\App\Http\Requests\SwiftPosLoginRequest;
+use POS\ShopfrontPos\App\Http\Controllers\Controller;
+use POS\ShopfrontPos\App\Http\Requests\ShopfrontPosLoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,16 +21,16 @@ class AuthenticatedSessionController extends Controller
         // ?? null;
         //dd($tenantId);
         // return view('layouts.tenant.swiftpos.auth.login', compact('tenantId'));
-        return view('swiftpos::layouts.auth.login');
+        return view('shopfrontpos::layouts.auth.login');
     }
 
-    public function store(SwiftPosLoginRequest $request): RedirectResponse
+    public function store(ShopfrontPosLoginRequest $request): RedirectResponse
     {
         //dd('store method called');
         $request->authenticate();
         $request->session()->regenerate();
 
-        $user = Auth::guard('swiftpos')->user();
+        $user = Auth::guard('shopfrontpos')->user();
         
         // Redirect based on user roles
         // if ($user->hasRole('superadmin')) {
@@ -45,14 +45,14 @@ class AuthenticatedSessionController extends Controller
                 ?? request()->input('tenant')
                 ?? null;
         if ($user->hasRole('staff')) {
-            return redirect()->route('swiftpos.dashboard', ['tenant' => $tenantId]);
+            return redirect()->route('shopfrontpos.dashboard', ['tenant' => $tenantId]);
         }
 
         if ($user->hasRole('manager')) {
-            return redirect()->route('swiftpos.dashboard', ['tenant' => $tenantId]);
+            return redirect()->route('shopfrontpos.dashboard', ['tenant' => $tenantId]);
         }
 
-        return redirect()->intended('/swiftpos/dashboard');
+        return redirect()->intended('/shopfrontpos/dashboard');
     }
 
     public function destroy(Request $request): RedirectResponse
@@ -64,8 +64,8 @@ class AuthenticatedSessionController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         
-        Auth::guard('swiftpos')->logout();
+        Auth::guard('shopfrontpos')->logout();
        
-        return redirect()->route('swiftpos.login', ['tenant' => $tenantId]);
+        return redirect()->route('shopfrontpos.login', ['tenant' => $tenantId]);
     }
 }

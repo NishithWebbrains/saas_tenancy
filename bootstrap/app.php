@@ -12,8 +12,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         api: __DIR__.'/../routes/api.php',
-        commands: __DIR__.'/../POS/SwiftPos/routes/console.php',
-        //tenant_swiftpos: __DIR__.'/../POS/SwiftPos/routes/tenant_swiftpos.php',
+        commands: __DIR__.'/../routes/console.php',
+        
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
@@ -21,9 +21,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'superadmin' => EnsureSuperadmin::class, // ✅ register here
             'tenant.access' => \App\Http\Middleware\CheckTenantAccess::class,
             'tenant' => \App\Http\Middleware\TenantMiddleware::class,
-            'auth.shopfrontpos' => \App\Http\Middleware\POS\AuthenticateShopfrontPos::class,
+            'auth.shopfrontpos' => POS\ShopfrontPos\App\Http\Middleware\AuthenticateShopfrontPos::class,
             'auth.swiftpos' => POS\SwiftPos\App\Http\Middleware\AuthenticateSwiftPos::class,
-            'auth.abspos' => \App\Http\Middleware\POS\AuthenticateAbsPos::class,
+            'auth.abspos' => POS\AbsPos\App\Http\Middleware\AuthenticateAbsPos::class,
 
         ]);
     })

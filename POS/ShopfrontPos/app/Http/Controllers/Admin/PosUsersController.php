@@ -1,9 +1,9 @@
 <?php
 
-namespace POS\SwiftPos\App\Http\Controllers\Admin;
+namespace POS\ShopfrontPos\App\Http\Controllers\Admin;
 
 use Illuminate\Support\Str;
-use POS\SwiftPos\App\Http\Controllers\Controller;
+use POS\ShopfrontPos\App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use App\Models\Tenant;
@@ -27,14 +27,14 @@ class PosUsersController extends Controller
 
     public function view()
     {
-       return view('swiftpos::layouts.posusers');
+       return view('shopfrontpos::layouts.posusers');
     //    return redirect()->route('stores.index')
     }
 
     public function createuser()
     {
        //dd($tenants);
-        return view('swiftpos::layouts.createuser');
+        return view('shopfrontpos::layouts.createuser');
     }
 
     /**
