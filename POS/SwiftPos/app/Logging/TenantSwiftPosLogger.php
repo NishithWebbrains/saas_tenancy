@@ -3,7 +3,7 @@
 namespace POS\SwiftPos\App\Logging;
 
 use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
+use Monolog\Handler\RotatingFileHandler;
 
 class TenantSwiftPosLogger
 {
@@ -15,17 +15,27 @@ class TenantSwiftPosLogger
      */
     public function __invoke(array $config)
     {
-        
         $tenantId = tenant('id') ?? 'unknown'; // Stancl Tenancy helper
-        $path = base_path("POS/SwiftPos/storage/logs/{$tenantId}_laravel.log");
+        $logDir = base_path("POS/SwiftPos/storage/logs");
 
         // Ensure directory exists
-        if (!is_dir(dirname($path))) {
-            mkdir(dirname($path), 0775, true);
+        if (!is_dir($logDir)) {
+            mkdir($logDir, 0775, true);
         }
 
-        $logger = new Logger("tenant_swiftpos_{$tenantId}");
-        $logger->pushHandler(new StreamHandler($path, Logger::toMonologLevel($config['level'])));
+        // File pattern: tenantID_laravel.log (rotated daily)
+        $logFile = "{$logDir}/tenant_{$tenantId}_laravel.log";
+
+        $logger = new Logger("{$tenantId}");
+
+        // keep 14 days of logs (you can change 14)
+        $handler = new RotatingFileHandler(
+            $logFile,
+            $config['days'] ?? 14,
+            Logger::toMonologLevel($config['level'] ?? 'debug')
+        );
+
+        $logger->pushHandler($handler);
 
         return $logger;
     }
