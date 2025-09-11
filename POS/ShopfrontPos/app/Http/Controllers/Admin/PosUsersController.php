@@ -27,6 +27,7 @@ class PosUsersController extends Controller
 
     public function view()
     {
+        \Log::channel('shopfrontpos')->info('shopfrontpos: Store User Listing.');
        return view('shopfrontpos::layouts.posusers');
     //    return redirect()->route('stores.index')
     }

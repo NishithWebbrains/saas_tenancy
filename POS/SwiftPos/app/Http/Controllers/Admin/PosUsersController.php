@@ -25,8 +25,12 @@ class PosUsersController extends Controller
             ?? null;
     }
 
-    public function view()
+    public function view()  
     {
+        \Log::channel('tenant_swiftpos')->info('SwiftPOS action executed', [
+            'tenant_id' => tenant('id'),
+        ]);
+
        return view('swiftpos::layouts.posusers');
     //    return redirect()->route('stores.index')
     }

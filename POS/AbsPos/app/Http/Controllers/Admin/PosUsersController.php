@@ -27,6 +27,7 @@ class PosUsersController extends Controller
 
     public function view()
     {
+        \Log::channel('abspos')->info('abspos: Store User Listing.');
        return view('abspos::layouts.posusers');
     //    return redirect()->route('stores.index')
     }

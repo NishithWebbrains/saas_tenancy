@@ -51,6 +51,26 @@ return [
     */
 
     'channels' => [
+        'swiftpos' => [
+            'driver' => 'single',
+            'path' => base_path('POS/SwiftPos/storage/logs/laravel.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'replace_placeholders' => true,
+        ],
+
+        'shopfrontpos' => [
+            'driver' => 'single',
+            'path' => base_path('POS/Shopfront/storage/logs/laravel.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'replace_placeholders' => true,
+        ],
+
+        'abspos' => [
+            'driver' => 'single',
+            'path' => base_path('POS/BigCommerce/storage/logs/laravel.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'replace_placeholders' => true,
+        ],   
 
         'stack' => [
             'driver' => 'stack',
@@ -126,6 +146,12 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+
+        'tenant_swiftpos' => [
+            'driver' => 'custom',
+            'via' => POS\SwiftPos\App\Logging\TenantSwiftPosLogger::class,
+            'level' => env('LOG_LEVEL', 'debug'),
+        ],     
 
     ],
 
