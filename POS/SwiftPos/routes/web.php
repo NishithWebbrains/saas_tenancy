@@ -7,7 +7,7 @@ use Stancl\Tenancy\Middleware\InitializeTenancyByPath;
 use POS\SwiftPos\App\Http\Controllers\Auth\AuthenticatedSessionController;
 use POS\SwiftPos\App\Http\Controllers\Admin\PosUsersController;
 use POS\SwiftPos\App\Http\Controllers\Admin\PosRolesController;
-use POS\SwiftPos\App\Http\Controllers\Admin\PosPermissionController;
+use POS\SwiftPos\App\Http\Controllers\Admin\PermissionController;
 
 Route::middleware([
     'web',
@@ -39,7 +39,7 @@ Route::middleware([
     Route::get('/roledata', [PosRolesController::class, 'roledata'])->name('swiftpos.roledata');
 
     //permission
-    Route::get('/permission', [PosPermissionController::class, 'view'])->name('swiftpos.permission');
+    Route::get('/permission', [PermissionController::class, 'view'])->name('swiftpos.permission');
 
     //tenant users
     Route::get('/posusers', [PosUsersController::class, 'view'])->name('swiftpos.posusers');

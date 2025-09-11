@@ -5,13 +5,13 @@
 
 @section('content')
 <div class="container">
-    <h2>Permissions</h2>
+    <h2>Permissions for Role: {{ $role->name }}</h2>
     @php
         $tenantId = request()->route('tenant')
             ?? request()->segment(1)
             ?? request()->input('tenant')
             ?? null;
-        $roleId = request()->route('role') ?? null;
+        $roleId = $role->id ?? null;
     @endphp
 
     <a href="{{ route('swiftpos.roles', ['tenant' => $tenantId]) }}" class="btn btn-danger mb-3">← Back to Roles</a>
@@ -22,18 +22,25 @@
           <thead>
             <tr>
                 <th>Module</th>
-                <th class="text-center">Authorize</th>
-                <th class="text-center">View</th>
+                @foreach($permissions as $permission)
+                    <th class="text-center">{{ ucfirst($permission->name) }}</th>
+                @endforeach
             </tr>
           </thead>
           <tbody>
-            {{-- Example static rows, later you can loop modules from DB --}}
-            <tr>
-                <td>dashboard</td>
-                <td class="text-center"><input type="checkbox" name="permissions[products][create]"></td>
-                <td class="text-center"><input type="checkbox" name="permissions[products][update]"></td>
-            </tr>
-            
+            @foreach($menus as $menu)
+                <tr>
+                    <td>{{ $menu->name }}</td>
+                    @foreach($permissions as $permission)
+                        <td class="text-center">
+                            <input type="checkbox" 
+                                   name="permissions[{{ $menu->id }}][]" 
+                                   value="{{ $permission->id }}"
+                                   {{ in_array($permission->id, $assignedPermissions[$menu->id] ?? []) ? 'checked' : '' }}>
+                        </td>
+                    @endforeach
+                </tr>
+            @endforeach
           </tbody>
         </table>
         <button type="submit" class="btn btn-primary">Save Permissions</button>
@@ -44,7 +51,6 @@
 @push('scripts')
 <script>
 $(document).ready(function() {
-    // If you later fetch permissions dynamically, you can load them with AJAX here
     console.log("Permissions page loaded for tenant: {{ $tenantId }}, role: {{ $roleId }}");
 });
 </script>
