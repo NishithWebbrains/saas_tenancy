@@ -72,56 +72,38 @@ class PermissionController extends Controller
 
     // Save the permissions (expects an array of values)
     // Accepts permissions as array of strings "permissionId,menuId" OR structured array
-    public function savePermissions(Request $request, $tenantId, $roleId)
+    public function savepermissions(Request $request , $roleId)
     {
-        $request->validate([
-            'permissions' => 'nullable|array'
+        \Log::info('savepermissions called', [
+            'all_route_params' => request()->route()->parameters(),
+            'role_param'   => $roleId ?? null,
         ]);
-
-        $tenant = \App\Models\Tenant::find($tenantId);
-        if (!$tenant) {
-            return response()->json(['message' => 'Tenant not found.'], 404);
-        }
-
-        $permissions = $request->input('permissions', []);
-
-        try {
-            $tenant->run(function () use ($permissions, $roleId) {
-                // Remove old permissions for role
-                DB::table('permission_roles')->where('role_id', $roleId)->delete();
-
-                $toInsert = [];
-                foreach ($permissions as $p) {
-                    // if value is "permissionId,menuId"
-                    if (is_string($p) && strpos($p, ',') !== false) {
-                        [$permissionId, $menuId] = explode(',', $p);
-                        $toInsert[] = [
-                            'role_id' => $roleId,
-                            'menu_id' => (int) $menuId,
-                            'permission_id' => (int) $permissionId,
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                        ];
-                    } elseif (is_array($p) && isset($p['permission_id']) && isset($p['menu_id'])) {
-                        $toInsert[] = [
-                            'role_id' => $roleId,
-                            'menu_id' => (int) $p['menu_id'],
-                            'permission_id' => (int) $p['permission_id'],
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                        ];
-                    }
+        $tenantId = request()->route('tenant')
+        ?? request()->segment(1)
+        ?? request()->input('tenant')
+        ?? null;
+        $tenant = Tenant::findOrFail($tenantId);
+    
+        $tenant->run(function () use ($request, $roleId) {
+            $role = Role::findOrFail($roleId);
+    
+            // Get permissions array from request
+            $permissionsInput = $request->input('permissions', []); 
+            // This will be grouped by menu_id
+    
+            $permissionIds = [];
+            foreach ($permissionsInput as $menuId => $perms) {
+                foreach ($perms as $permId) {
+                    $permissionIds[$permId] = ['menu_id' => $menuId]; // already actual permission IDs
                 }
-
-                if (!empty($toInsert)) {
-                    DB::table('permission_roles')->insert($toInsert);
-                }
-            });
-
-            return response()->json(['message' => 'Permissions saved successfully.']);
-        } catch (\Throwable $e) {
-            \Log::error('Error saving permissions: '.$e->getMessage(), ['trace'=>$e->getTraceAsString()]);
-            return response()->json(['message' => 'Failed to save permissions.'], 500);
-        }
+            }
+    
+            // Sync directly since we already have IDs
+            $role->permissions()->sync($permissionIds);
+        });
+    
+        return response()->json(['message' => 'Permissions saved successfully.']);
     }
+    
+
 }

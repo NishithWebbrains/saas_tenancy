@@ -13,6 +13,10 @@ return new class extends Migration {
             $table->string('name')->unique();
             $table->timestamps();
         });
+        DB::table('roles')->insert([
+            ['name' => 'Staff',    'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Manager',   'created_at' => now(), 'updated_at' => now()],
+        ]);
     }
 
     public function down(): void

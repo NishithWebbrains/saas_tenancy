@@ -1,15 +1,18 @@
 <?php
-// app/Models/Tenant/Role.php
 namespace App\Models\Tenant;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Role extends Model
 {
-    use HasFactory;
-
+    protected $connection = 'tenant'; // ensure it's pointing to tenant DB
     protected $fillable = [
         'name',
     ];
+    public function permissions()
+    {
+        // Explicitly tell Laravel the pivot table name
+        return $this->belongsToMany(Permission::class, 'permission_roles', 'role_id', 'permission_id')
+                    ->withTimestamps();
+    }
 }

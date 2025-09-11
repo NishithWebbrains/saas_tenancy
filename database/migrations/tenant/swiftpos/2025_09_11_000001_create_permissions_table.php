@@ -13,6 +13,9 @@ return new class extends Migration {
             $table->string('slug')->nullable(); // optional
             $table->timestamps();
         });
+        DB::table('permissions')->insert([
+            ['name' => 'View',   'slug' => 'view',   'created_at' => now(), 'updated_at' => now()],
+        ]);
     }
 
     public function down(): void

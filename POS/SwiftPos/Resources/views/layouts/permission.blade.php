@@ -16,7 +16,7 @@
 
     <a href="{{ route('swiftpos.roles', ['tenant' => $tenantId]) }}" class="btn btn-danger mb-3">← Back to Roles</a>
 
-    <form id="permissionsForm" method="POST" action="{{ route('swiftpos.addrole', ['tenant' => $tenantId, 'role' => $roleId]) }}">
+    <form id="permissionsForm" method="POST" action="{{ route('swiftpos.savepermissions', ['tenant' => $tenantId, 'role' => $roleId]) }}">
         @csrf
         <table id="permissionsTable" class="table table-bordered">
           <thead>

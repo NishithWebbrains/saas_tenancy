@@ -40,6 +40,7 @@ Route::middleware([
 
     //permission
     Route::get('/permission', [PermissionController::class, 'view'])->name('swiftpos.permission');
+    Route::post('/{role}/savepermissions', [PermissionController::class, 'savepermissions'])->name('swiftpos.savepermissions');
 
     //tenant users
     Route::get('/posusers', [PosUsersController::class, 'view'])->name('swiftpos.posusers');
