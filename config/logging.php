@@ -147,6 +147,16 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        'tenant_abspos' => [
+            'driver' => 'custom',
+            'via' => POS\AbsPos\App\Logging\TenantAbsPosLogger::class,
+            'level' => env('LOG_LEVEL', 'debug'),
+        ],     
+        'tenant_shopfrontpos' => [
+            'driver' => 'custom',
+            'via' => POS\ShopfrontPos\App\Logging\TenantShopfrontPosLogger::class,
+            'level' => env('LOG_LEVEL', 'debug'),
+        ],     
         'tenant_swiftpos' => [
             'driver' => 'custom',
             'via' => POS\SwiftPos\App\Logging\TenantSwiftPosLogger::class,

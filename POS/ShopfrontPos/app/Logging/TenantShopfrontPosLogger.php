@@ -1,12 +1,13 @@
 <?php
 
-namespace POS\SwiftPos\App\Logging;
+namespace POS\ShopfrontPos\App\Logging;
 
 use Monolog\Logger;
 use Monolog\Handler\RotatingFileHandler;
-use POS\SwiftPos\App\Models\TenantDetail;
 
-class TenantSwiftPosLogger
+use POS\ShopfrontPos\App\Models\TenantDetail;
+
+class TenantShopfrontPosLogger
 {
     /**
      * Create a custom Monolog instance.
@@ -36,7 +37,7 @@ class TenantSwiftPosLogger
         $safeTenantName = preg_replace('/[^A-Za-z0-9_\-]/', '_', strtolower($tenantName));
         $safeTenantId   = preg_replace('/[^A-Za-z0-9_\-]/', '_', (string) $tenantId);
 
-        $logDir = base_path("POS/SwiftPos/storage/logs");
+        $logDir = base_path("POS/ShopfrontPos/storage/logs");
 
         if (!is_dir($logDir)) {
             mkdir($logDir, 0775, true);
