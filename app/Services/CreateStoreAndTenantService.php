@@ -81,6 +81,14 @@ class CreateStoreAndTenantService
                     '--force' => true,
                 ]);
             }
+            // ✅ Run the roles migration explicitly
+            $rolesMigrationPath = 'database/migrations/tenant/swiftpos/2025_09_11_000000_create_roles_table.php';
+            if (file_exists(base_path($rolesMigrationPath))) {
+                Artisan::call('migrate', [
+                    '--path'  => $rolesMigrationPath,
+                    '--force' => true,
+                ]);
+            }
         });
 
         return $store;

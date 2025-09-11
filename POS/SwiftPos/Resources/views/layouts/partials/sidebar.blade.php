@@ -28,6 +28,13 @@
             <p>Store Users</p>
           </a>
         </li>
+        <li class="nav-item menu-open">
+            
+          <a href="{{ route('swiftpos.roles', ['tenant' => $tenantId]) }}" class="nav-link active">
+            <i class="nav-icon bi bi-speedometer"></i>
+            <p>Roles</p>
+          </a>
+        </li>
         
         <!-- more items -->
       </ul>

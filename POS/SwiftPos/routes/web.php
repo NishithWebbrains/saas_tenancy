@@ -6,6 +6,8 @@ use POS\SwiftPos\App\Models\TenantDetail;
 use Stancl\Tenancy\Middleware\InitializeTenancyByPath;
 use POS\SwiftPos\App\Http\Controllers\Auth\AuthenticatedSessionController;
 use POS\SwiftPos\App\Http\Controllers\Admin\PosUsersController;
+use POS\SwiftPos\App\Http\Controllers\Admin\PosRolesController;
+use POS\SwiftPos\App\Http\Controllers\Admin\PosPermissionController;
 
 Route::middleware([
     'web',
@@ -30,7 +32,16 @@ Route::middleware([
             'products' => $products,
         ]);
         })->name('swiftpos.dashboard');
+    //roles
+    Route::get('/roles', [PosRolesController::class, 'view'])->name('swiftpos.roles');
+    Route::get('/createrole', [PosRolesController::class, 'createrole'])->name('swiftpos.createrole');
+    Route::post('/addrole', [PosRolesController::class, 'addrole'])->name('swiftpos.addrole');
+    Route::get('/roledata', [PosRolesController::class, 'roledata'])->name('swiftpos.roledata');
 
+    //permission
+    Route::get('/permission', [PosPermissionController::class, 'view'])->name('swiftpos.permission');
+
+    //tenant users
     Route::get('/posusers', [PosUsersController::class, 'view'])->name('swiftpos.posusers');
     Route::get('createuser', [PosUsersController::class, 'createuser'])->name('swiftpos.createuser');
     Route::post('/storeuser', [PosUsersController::class, 'storeuser'])->name('swiftpos.storeuser');
