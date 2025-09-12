@@ -15,12 +15,14 @@
             @endphp
       <!-- copy nav markup from index.html or build your menu -->
       <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" id="navigation">
+      @if(auth('swiftpos')->user()?->canAccess('dashboard','view'))
         <li class="nav-item menu-open">
           <a href="{{ route('swiftpos.dashboard', ['tenant' => $tenantId]) }}" class="nav-link active">
             <i class="nav-icon bi bi-speedometer"></i>
             <p>Dashboard <i class="nav-arrow bi bi-chevron-right"></i></p>
           </a>
         </li>
+        @endif
         <li class="nav-item menu-open">
             
           <a href="{{ route('swiftpos.posusers', ['tenant' => $tenantId]) }}" class="nav-link active">

@@ -9,10 +9,15 @@ class Role extends Model
     protected $fillable = [
         'name',
     ];
+    public function users()
+    {
+        return $this->hasMany(TenantUser::class, 'role_id');
+    }
+
     public function permissions()
     {
         // Explicitly tell Laravel the pivot table name
         return $this->belongsToMany(Permission::class, 'permission_roles', 'role_id', 'permission_id')
-                    ->withTimestamps();
+                    ->withPivot('menu_id');
     }
 }

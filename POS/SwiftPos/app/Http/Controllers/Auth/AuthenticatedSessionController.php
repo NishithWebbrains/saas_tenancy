@@ -44,11 +44,14 @@ class AuthenticatedSessionController extends Controller
                 ?? request()->segment(1)
                 ?? request()->input('tenant')
                 ?? null;
-        if ($user->hasRole('staff')) {
+        if ($user->hasRole('Staff')) {
             return redirect()->route('swiftpos.dashboard', ['tenant' => $tenantId]);
         }
 
-        if ($user->hasRole('manager')) {
+        if ($user->hasRole('Manager')) {
+            return redirect()->route('swiftpos.dashboard', ['tenant' => $tenantId]);
+        }
+        if ($user->hasRole('Employee')) {
             return redirect()->route('swiftpos.dashboard', ['tenant' => $tenantId]);
         }
 
