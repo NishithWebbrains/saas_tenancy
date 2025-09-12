@@ -5,11 +5,11 @@ namespace App\Models\Tenant;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class TenantUser extends Authenticatable
 {
-    use Notifiable, HasRoles;
+    use Notifiable, HasFactory;
 
     protected $table = 'tenant_users';
 
@@ -18,7 +18,7 @@ class TenantUser extends Authenticatable
         'email',
         'password',
         'pos_type',
-        'roles',
+        'role_id',
     ];
 
     protected $hidden = [
@@ -28,13 +28,16 @@ class TenantUser extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'roles' => 'array',
         'password' => 'hashed',
     ];
 
-    public function hasRole($role)
+    public function role()
     {
-        $roles = $this->roles ?? [];
-        return in_array($role, $roles);
+        return $this->belongsTo(Role::class, 'role_id');
+    }
+    
+    public function hasRole($roleName): bool
+    {
+        return $this->role && $this->role->name === $roleName;
     }
 }

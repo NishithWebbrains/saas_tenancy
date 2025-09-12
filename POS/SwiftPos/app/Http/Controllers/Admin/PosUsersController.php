@@ -38,7 +38,14 @@ class PosUsersController extends Controller
     public function createuser()
     {
        //dd($tenants);
-        return view('swiftpos::layouts.createuser');
+       $tenantId = $this->tenantId;
+       $tenant   = Tenant::findOrFail($tenantId);
+       $roles = $tenant->run(function () {
+        return \App\Models\Tenant\Role::all(); // fetch roles from tenant DB
+    });
+        return view('swiftpos::layouts.createuser',[
+            'roles'    => $roles,
+        ]);
     }
 
     /**
@@ -46,48 +53,42 @@ class PosUsersController extends Controller
      */
     public function storeuser(Request $request)
     {
-            $request->validate([
-                'name'     => 'required|string|max:255',
-                'email'    => 'required|email|unique:tenant_users,email',
-                'password' => 'required|min:6',
-                'role'     => 'required|string',
+        $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:tenant_users,email',
+            'password' => 'required|min:6',
+            'role'     => 'required|integer', // role_id, coming from roles table
+        ]);
+
+        $tenantId = $this->tenantId;
+        $tenant   = Tenant::findOrFail($tenantId);
+
+        // Resolve tenant-specific DB connection
+        $tenantDbName = $tenant->tenancy_db_name;
+        $defaultConnection = config('database.connections.mysql');
+        $dynamicConnection = $defaultConnection;
+        $dynamicConnection['database'] = $tenantDbName;
+        config(["database.connections.tenant_dynamic" => $dynamicConnection]);
+
+        $posType = DB::connection('tenant_dynamic')
+            ->table('tenant_details')
+            ->value('pos_type');
+
+        $tenant->run(function () use ($request, $posType) {
+            TenantUser::create([
+                'name'     => $request->name,
+                'email'    => $request->email,
+                'password' => Hash::make($request->password),
+                'pos_type' => $posType,
+                'role_id'  => $request->role, // ✅ directly assign role_id
             ]);
+        });
 
-            
-            // Step 2: Assign user into selected tenant databases
-            
-
-                // Fetch tenant to get its DB name
-            $tenantId = $this->tenantId;
-            $tenant = Tenant::find($tenantId);
-                //taking tenants pos_type...
-                $tenantDbName = $tenant->tenancy_db_name;
-                $defaultConnection = config('database.connections.mysql');
-                $dynamicConnection = $defaultConnection;
-                $dynamicConnection['database'] = $tenantDbName;
-                config(["database.connections.tenant_dynamic" => $dynamicConnection]);
-
-                // 2. Query tenant_details table in the dynamic DB
-                $posType = DB::connection('tenant_dynamic')
-                    ->table('tenant_details')
-                    ->value('pos_type');
-          
-            
-            $tenant->run(function () use ($request, $tenant,$posType) {
-                TenantUser::create([
-                    'name' => $request->name,
-                    'email' => $request->email,
-                    'password' => Hash::make($request->password),
-                    'pos_type' => $posType,
-                    'roles' => [$request->role],
-                ]);
-            });
-           
-            // \Log::info("➡️ Assigning user to tenant", ['tenant_id' => $tenant->id]);
-        
         return redirect()->route('swiftpos.posusers', ['tenant' => $tenantId])
-                         ->with('success', 'User created in central DB and assigned to selected tenants.');
+                        ->with('success', 'User created and role assigned successfully.');
     }
+
+
     public function storeusersdata()
     {
         \Log::info('storeusersdata method called.');
