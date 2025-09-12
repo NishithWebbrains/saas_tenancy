@@ -33,7 +33,7 @@ $(document).ready(function() {
     $('#usersTable').DataTable({
         processing: true,
         serverSide: true,
-        ajax: "{{ route('abspos.storeusersdata', ['tenant' => $tenantId]) }}",
+        ajax: "{{ route('shopfrontpos.storeusersdata', ['tenant' => $tenantId]) }}",
         columns: [
             { data: 'id', name: 'id' },
             { data: 'name', name: 'name' },

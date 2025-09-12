@@ -20,7 +20,7 @@ class AuthenticatedSessionController extends Controller
         // ?? request()->input('tenant')
         // ?? null;
         //dd($tenantId);
-        // return view('layouts.tenant.swiftpos.auth.login', compact('tenantId'));
+        // return view('layouts.tenant.abspos.auth.login', compact('tenantId'));
         return view('abspos::layouts.auth.login');
     }
 
@@ -34,21 +34,24 @@ class AuthenticatedSessionController extends Controller
         
         // Redirect based on user roles
         // if ($user->hasRole('superadmin')) {
-        //     return redirect()->route('swiftpos.admin.store-users.index');
+        //     return redirect()->route('abspos.admin.store-users.index');
         // }
 
         // if ($user->hasRole('storeadmin')) {
-        //     return redirect()->route('swiftpos.stores.index');
+        //     return redirect()->route('abspos.stores.index');
         // }
         $tenantId = request()->route('tenant')
                 ?? request()->segment(1)
                 ?? request()->input('tenant')
                 ?? null;
-        if ($user->hasRole('staff')) {
+        if ($user->hasRole('Staff')) {
             return redirect()->route('abspos.dashboard', ['tenant' => $tenantId]);
         }
 
-        if ($user->hasRole('manager')) {
+        if ($user->hasRole('Manager')) {
+            return redirect()->route('abspos.dashboard', ['tenant' => $tenantId]);
+        }
+        if ($user->hasRole('Employee')) {
             return redirect()->route('abspos.dashboard', ['tenant' => $tenantId]);
         }
 

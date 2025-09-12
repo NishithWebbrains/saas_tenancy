@@ -6,6 +6,8 @@ use POS\ShopfrontPos\App\Models\TenantDetail;
 use Stancl\Tenancy\Middleware\InitializeTenancyByPath;
 use POS\ShopfrontPos\App\Http\Controllers\Auth\AuthenticatedSessionController;
 use POS\ShopfrontPos\App\Http\Controllers\Admin\PosUsersController;
+use POS\ShopfrontPos\App\Http\Controllers\Admin\PosRolesController;
+use POS\ShopfrontPos\App\Http\Controllers\Admin\PermissionController;
 
 Route::middleware([
     'web',
@@ -30,7 +32,17 @@ Route::middleware([
             'products' => $products,
         ]);
         })->name('shopfrontpos.dashboard');
+    //roles
+    Route::get('/roles', [PosRolesController::class, 'view'])->name('shopfrontpos.roles');
+    Route::get('/createrole', [PosRolesController::class, 'createrole'])->name('shopfrontpos.createrole');
+    Route::post('/addrole', [PosRolesController::class, 'addrole'])->name('shopfrontpos.addrole');
+    Route::get('/roledata', [PosRolesController::class, 'roledata'])->name('shopfrontpos.roledata');
 
+    //permission
+    Route::get('/permission', [PermissionController::class, 'view'])->name('shopfrontpos.permission');
+    Route::post('/{role}/savepermissions', [PermissionController::class, 'savepermissions'])->name('shopfrontpos.savepermissions');
+
+    //tenant users
     Route::get('/posusers', [PosUsersController::class, 'view'])->name('shopfrontpos.posusers');
     Route::get('createuser', [PosUsersController::class, 'createuser'])->name('shopfrontpos.createuser');
     Route::post('/storeuser', [PosUsersController::class, 'storeuser'])->name('shopfrontpos.storeuser');
