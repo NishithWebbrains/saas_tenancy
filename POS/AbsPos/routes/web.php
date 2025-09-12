@@ -8,7 +8,6 @@ use POS\ShopfrontPos\App\Http\Controllers\Auth\AuthenticatedSessionController;
 use POS\ShopfrontPos\App\Http\Controllers\Admin\PosUsersController;
 use POS\ShopfrontPos\App\Http\Controllers\Admin\PosRolesController;
 use POS\ShopfrontPos\App\Http\Controllers\Admin\PermissionController;
-
 Route::middleware([
     'web',
     InitializeTenancyByPath::class,
