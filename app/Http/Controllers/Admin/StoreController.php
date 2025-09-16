@@ -68,17 +68,12 @@ return redirect()->route('stores.edit', $store);
         $this->authorizeStore($store);
 
         $data = $request->validate([
-            'name'  => ['required','string','max:255'],
-            'slug'  => ['required','alpha_dash','unique:stores,slug,'.$store->id],
-            'clientid' => ['nullable', 'string', 'max:255'],
-            'client_password' => ['nullable', 'string', 'max:255'],
-            'store_id' => ['nullable', 'string', 'max:255'],
-            'external_storeid' => ['nullable', 'string', 'max:255'],
-            'shopfrontpos_vendor_identifier' => ['nullable', 'string', 'max:255'],
-            'swiftpos_vendor_identifier' => ['nullable', 'string', 'max:255'],
-            'abspos_vendor_identifier' => ['nullable', 'string', 'max:255'],
-
+            'name' => ['required', 'string', 'max:255'],
+            // do not validate slug as user input here
         ]);
+        
+        $data['slug'] = Str::slug($data['name']);
+        //dd($data);
         $store->update($data);
 
         return back()->with('status','Store updated');
