@@ -41,6 +41,7 @@ Route::middleware([
     Route::get('/permission', [PermissionController::class, 'view'])->name('shopfrontpos.permission');
     Route::post('/{role}/savepermissions', [PermissionController::class, 'savepermissions'])->name('shopfrontpos.savepermissions');
 
+    
     //tenant users
     Route::get('/posusers', [PosUsersController::class, 'view'])->name('shopfrontpos.posusers');
     Route::get('createuser', [PosUsersController::class, 'createuser'])->name('shopfrontpos.createuser');
