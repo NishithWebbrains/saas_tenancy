@@ -69,6 +69,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('stores/data', [StoreController::class, 'getData'])->name('stores.data');
     Route::get('/stores/data/count', [StoreController::class, 'getDataCount'])->name('stores.data.count');
     Route::resource('stores', StoreController::class);
+    
+    Route::put('stores/{store}/zkong-update', [StoreController::class, 'updateZkongCredentials'])->name('stores.zkong-update');
+    Route::put('stores/{store}/pos-vendor-update', [StoreController::class, 'updatePosVendorIdentifier'])->name('stores.pos-vendor-update');
+
 });
 
 //tenant user management

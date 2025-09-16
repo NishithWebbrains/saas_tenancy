@@ -15,17 +15,26 @@
             @endphp
       <!-- copy nav markup from index.html or build your menu -->
       <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" id="navigation">
+      @if(auth('shopfrontpos')->user()?->canAccess('dashboard','view'))
         <li class="nav-item menu-open">
           <a href="{{ route('shopfrontpos.dashboard', ['tenant' => $tenantId]) }}" class="nav-link active">
             <i class="nav-icon bi bi-speedometer"></i>
             <p>Dashboard <i class="nav-arrow bi bi-chevron-right"></i></p>
           </a>
         </li>
+        @endif
         <li class="nav-item menu-open">
             
           <a href="{{ route('shopfrontpos.posusers', ['tenant' => $tenantId]) }}" class="nav-link active">
             <i class="nav-icon bi bi-speedometer"></i>
             <p>Store Users</p>
+          </a>
+        </li>
+        <li class="nav-item menu-open">
+            
+          <a href="{{ route('shopfrontpos.roles', ['tenant' => $tenantId]) }}" class="nav-link active">
+            <i class="nav-icon bi bi-speedometer"></i>
+            <p>Roles</p>
           </a>
         </li>
         

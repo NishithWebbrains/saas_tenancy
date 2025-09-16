@@ -51,9 +51,8 @@ class StoreController extends Controller
 
         // Build tenant path URL dynamically with POS segment
         $tenantUrl = url('/' . $tenantId . '/' . $posSegment . '/dashboard');
-
-        return redirect()->to($tenantUrl)
-            ->with('status', 'Store created and tenant initialized.');
+$store = $tenant;
+return redirect()->route('stores.edit', $store);
     }
 
 
@@ -71,8 +70,15 @@ class StoreController extends Controller
         $data = $request->validate([
             'name'  => ['required','string','max:255'],
             'slug'  => ['required','alpha_dash','unique:stores,slug,'.$store->id],
-        ]);
+            'clientid' => ['nullable', 'string', 'max:255'],
+            'client_password' => ['nullable', 'string', 'max:255'],
+            'store_id' => ['nullable', 'string', 'max:255'],
+            'external_storeid' => ['nullable', 'string', 'max:255'],
+            'shopfrontpos_vendor_identifier' => ['nullable', 'string', 'max:255'],
+            'swiftpos_vendor_identifier' => ['nullable', 'string', 'max:255'],
+            'abspos_vendor_identifier' => ['nullable', 'string', 'max:255'],
 
+        ]);
         $store->update($data);
 
         return back()->with('status','Store updated');
@@ -110,10 +116,14 @@ class StoreController extends Controller
                     return $usersList;
                 })
                 ->addColumn('actions', function ($store) {
+                   
+                    // Build tenant path URL dynamically with POS segment
+                    $view = url('/' . $store['tenant_id'] . '/' . $store['pos_type'] . '/dashboard');
                     $editUrl = route('stores.edit', $store);
                     $deleteUrl = route('stores.destroy', $store);
 
                     return '
+                        <a href="'.$view.'" class="btn btn-sm btn-success">View</a>
                         <a href="'.$editUrl.'" class="btn btn-sm btn-warning">Edit</a>
                         <form action="'.$deleteUrl.'" method="POST" style="display:inline-block;">
                             '.csrf_field().method_field('DELETE').'
@@ -165,4 +175,41 @@ class StoreController extends Controller
 
         abort_unless($store->owner_user_id === auth()->id(), 403);
     }
+    
+
+    public function updateZkongCredentials(Request $request, Store $store)
+    {
+        $this->authorizeStore($store);
+        //dd('hu');
+        
+        $data = $request->validate([
+            'clientid' => ['nullable','string', 'max:255'],
+            'client_password' => ['nullable','string', 'max:255'],
+            'store_id' => ['nullable','string', 'max:255'],
+            'external_storeid' => ['nullable','string', 'max:255'],
+        ]);
+        //dd($request);
+        $store->update($data);
+
+        return back()->with('status', 'Zkong credentials updated successfully');
+    }
+
+    public function updatePosVendorIdentifier(Request $request, Store $store)
+    {
+        $this->authorizeStore($store);
+        
+        // Determine which vendor identifier field to validate by pos_type
+        $posType = $store->pos_type;
+
+        $fieldName = $posType.'_vendor_identifier';
+        //dd($fieldName);
+        $data = $request->validate([
+            $fieldName => ['required', 'string', 'max:255'],
+        ]);
+//dd($data);
+        $store->update($data);
+
+        return back()->with('status', ucfirst($posType).' vendor identifier updated successfully');
+    }
+
 }
